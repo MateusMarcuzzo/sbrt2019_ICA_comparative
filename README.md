@@ -1,5 +1,5 @@
 # sbrt2019_ICA_comparative
-Comparação de algoritmos de ICA para o caso de BSS e ICA puro
+# Comparação de algoritmos de ICA para o caso de BSS e ICA puro
 
 Este projeto envolve principalmente dois cenários de simulação:
 
