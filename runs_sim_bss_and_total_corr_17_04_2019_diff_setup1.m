@@ -9,8 +9,10 @@ clear;
 
 sim_start_time = localtime(time());
 
-some_primes = [2,3,5,7];
-n_sources = [6,7];
+%we wont do P=7 and K=6 and above anymore. It has frozen the computer
+% starting from K=6.
+some_primes = [2,3,5];
+n_sources = [6,7,8];
 n_samples = [2^8,2^9,2^10,2^11,2^12];
 
 % Must be a cel array, so we can do a strfind...

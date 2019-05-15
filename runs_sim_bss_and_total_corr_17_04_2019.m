@@ -126,7 +126,7 @@ for p_i = 1:length(some_primes)
 
 		        hits = sum(sum(Z,2)==1);    
 		        if(hits == K)  
-		        	bss_succ_rate(p_i,k_i,t_i,algo_i) += 1;
+		        	bss_succ_rate(p_i,k_i,t_i,algo_i) = bss_succ_rate(p_i,k_i,t_i,algo_i) +1;
 		        end 
 
 		        Y = produtomatrizGF(Wm,X,P,1,[]);
@@ -164,7 +164,7 @@ for p_i = 1:length(some_primes)
 
 		        hits = sum(sum(Z,2)==1);    
 		        if(hits == K)  
-		        	bss_succ_rate(p_i,k_i,t_i,algo_i) += 1;
+		        	bss_succ_rate(p_i,k_i,t_i,algo_i) = bss_succ_rate(p_i,k_i,t_i,algo_i) +1;
 		        end 
 
                 Y = produtomatrizGF(Wsa,X,P,1,[]);
@@ -227,7 +227,7 @@ for p_i = 1:length(some_primes)
 
 		        hits = sum(sum(Z,2)==1);    
 		        if(hits == K)  
-		        	bss_succ_rate(p_i,k_i,t_i,algo_i) += 1;
+		        	bss_succ_rate(p_i,k_i,t_i,algo_i) = bss_succ_rate(p_i,k_i,t_i,algo_i) + 1;
 		        end 
                 
                 
@@ -258,10 +258,10 @@ mean_total_corr_results = mean(total_corr_results, 5);
 
 % saves with the date (day/month/year) and the hour: hh:mm 
 % start and ending times
-start_time_str = strftime("sim_data_start_%d_%m_%Y_%H_%M",sim_start_time);
-saved_sim_str = strftime("_end_%d_%m_%Y_%H_%M_sim_bss_and_total_corr_17_04_2019",localtime(time()));
+start_time_str = strftime('sim_data_start_%d_%m_%Y_%H_%M',sim_start_time);
+saved_sim_str = strftime('_end_%d_%m_%Y_%H_%M_sim_bss_and_total_corr_17_04_2019',localtime(time()));
 
-saved_sim = sprintf("%s%s",start_time_str,saved_sim_str);
+saved_sim = sprintf('%s%s',start_time_str,saved_sim_str);
 save(saved_sim)
 
 
