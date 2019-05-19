@@ -45,7 +45,6 @@ sob diversas perspectivas e projeções dos dados.
 
 Antes de executarmos o plotter, pretendemos dar o load em alguns desses arquivos.
 
-No momento, o Plotter ainda não foi reconfigurado para o cenário atual. 
 
 ________________________
 
