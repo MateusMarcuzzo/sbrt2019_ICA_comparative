@@ -12,7 +12,7 @@ sim_start_time = localtime(time());
 %we wont do P=7 and K=6 and above anymore. It has frozen the computer
 % starting from K=6.
 some_primes = [2,3,5];
-n_sources = [6,7,8];
+n_sources = [6,7];
 n_samples = [2^8,2^9,2^10,2^11,2^12];
 
 % Must be a cel array, so we can do a strfind...
@@ -20,7 +20,7 @@ algorithms_names = {'america';'sa4ica';'GLICA'}
 
 the_algorithms = 1:length(algorithms_names);
 
-n_trials = 1;
+n_trials = 40;
 
 space = [ length(some_primes), length(n_sources), length(n_samples),...
  length(the_algorithms) ];
