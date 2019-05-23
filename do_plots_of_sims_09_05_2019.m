@@ -43,7 +43,7 @@ function one_plot = plot_P_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 
 	for algo_i = 1:length(algorithms_str)
 
-		plot(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),algorithms_str{algo_i},"marker",markers_list{algo_i});
+		semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),algorithms_str{algo_i},"marker",markers_list{algo_i});
 		hold on
 
 	end
@@ -57,7 +57,7 @@ function one_plot = plot_P_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 	set(gca,"xticklabel",x);
 
 
-	filename = sprintf("%s/%s/P_var/%s_K%d_T%d_trial_time.eps",first_save_folder,...
+	filename = sprintf("%s/%s/P_var/%s_K%d_T%d_trial_time.pdf",first_save_folder,...
 	 	trial_time_save_folder,this_file_date...
 	 	,n_sources(k_i),n_samples(t_i));
 
@@ -82,7 +82,7 @@ function one_plot = plot_P_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 	set(gca,"xtick",x);
 	set(gca,"xticklabel",x);
 
-	filename = sprintf("%s/%s/P_var/%s_K%d_T%d_total_corr.eps",first_save_folder,...
+	filename = sprintf("%s/%s/P_var/%s_K%d_T%d_total_corr.pdf",first_save_folder,...
 	 	total_corr_save_folder,this_file_date...
 	 	,n_sources(k_i),n_samples(t_i));
 
@@ -117,7 +117,7 @@ function one_plot = plot_T_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 
 	for algo_i = 1:length(algorithms_str)
 
-		plot(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),algorithms_str{algo_i},"marker",markers_list{algo_i});
+		semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),algorithms_str{algo_i},"marker",markers_list{algo_i});
 		hold on
 
 	end
@@ -131,7 +131,7 @@ function one_plot = plot_T_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 	set(gca,"xticklabel",x);
 
 
-	filename = sprintf("%s/%s/T_var/%s_K%d_P%d_trial_time.eps",first_save_folder,...
+	filename = sprintf("%s/%s/T_var/%s_K%d_P%d_trial_time.pdf",first_save_folder,...
 	 	trial_time_save_folder,this_file_date...
 	 	,n_sources(k_i),some_primes(p_i));
 
@@ -156,7 +156,7 @@ function one_plot = plot_T_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 	set(gca,"xtick",x);
 	set(gca,"xticklabel",x);
 
-	filename = sprintf("%s/%s/T_var/%s_K%d_P%d_total_corr.eps",first_save_folder,...
+	filename = sprintf("%s/%s/T_var/%s_K%d_P%d_total_corr.pdf",first_save_folder,...
 	 	total_corr_save_folder,this_file_date...
 	 	,n_sources(k_i),some_primes(p_i));
 
@@ -171,7 +171,7 @@ end
 function one_plot = plot_K_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 
 
-	xlabel_str = 'number of sources';
+	xlabel_str = 'K (dimension)';
 	first_save_folder = 'sim_plots_setup2';
 	
 	trial_time_save_folder = 'trial_time';
@@ -190,7 +190,7 @@ function one_plot = plot_K_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 
 	for algo_i = 1:length(algorithms_str)
 
-		plot(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),algorithms_str{algo_i},"marker",markers_list{algo_i});
+		semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),algorithms_str{algo_i},"marker",markers_list{algo_i});
 		hold on
 
 	end
@@ -204,7 +204,7 @@ function one_plot = plot_K_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 	set(gca,"xticklabel",x);
 
 
-	filename = sprintf("%s/%s/K_var/%s_T%d_P%d_trial_time.eps",first_save_folder,...
+	filename = sprintf("%s/%s/K_var/%s_T%d_P%d_trial_time.pdf",first_save_folder,...
 	 	trial_time_save_folder,this_file_date...
 	 	,n_samples(t_i),some_primes(p_i));
 
@@ -229,7 +229,7 @@ function one_plot = plot_K_case(x,sim_data,p_i,k_i,t_i,algorithms_str)
 	set(gca,"xtick",x);
 	set(gca,"xticklabel",x);
 
-	filename = sprintf("%s/%s/K_var/%s_T%d_P%d_total_corr.eps",first_save_folder,...
+	filename = sprintf("%s/%s/K_var/%s_T%d_P%d_total_corr.pdf",first_save_folder,...
 	 	total_corr_save_folder,this_file_date...
 	 	,n_samples(t_i),some_primes(p_i));
 
