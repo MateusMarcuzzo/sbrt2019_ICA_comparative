@@ -1,16 +1,15 @@
 # sbrt2019_ICA_comparative
-# Comparação de algoritmos de ICA para o caso de BSS e ICA puro
+# Comparação de algoritmos de ICA para o caso de BSS e ICA pura
 
 Este projeto envolve principalmente dois cenários de simulação:
 
-Utilizamos no primeiro cenário que chamaremos de setup 1
-Como três algoritmos diferentes de ICA linear resolvem o problem de separação cega de fontes (blind source separation - BSS).
+Utilizamos no primeiro cenário que chamaremos de setup 1, três algoritmos diferentes de ICA linear que resolvem o problem de separação cega de fontes (blind source separation - BSS).
 Mediremos a taxa de sucesso de separação perfeita (ou seja, separação parciais não conta aqui, apenas totais).
 Bem como guardaremos o tempo de cada trial e sua correlação total (informação mútua generalizada - Watanabe) para que possamos
 cruzar dados no futuro, caso necessário.
 
-O setup 2 é um experimento de ICA puro, e testamos quatro algoritmos diferentes, onde três deles são os três lineares do anterior e um deles
-, novo, não-linear chamado QICA.
+O setup 2 é um experimento de ICA pura, e testamos quatro algoritmos diferentes, onde três deles são os três lineares do anterior e um deles
+, novo, não-linear, chamado QICA.
 
 Dada a pmf conjunta Zipf, com os mesmos parâmetros encontrados no artigo do criador do algoritmo, Amichai Painsky, realizamos o mesmo experimento
 de medir a função objetivo de correlação total para ver quem executa ICA melhor, isto é, encontra componentes independentes o melhor quanto possível.
@@ -43,7 +42,7 @@ em um momento futuro, quando terminadas as simulações.
 Necessitamos destes arquivos para que possamos plotar gráficos das simulações e ter visualização do que ocorreu no experimento
 sob diversas perspectivas e projeções dos dados.
 
-Antes de executarmos o plotter, pretendemos dar o load em alguns desses arquivos.
+Antes de executarmos algum plotter, pretendemos dar o load em alguns desses arquivos.
 
 
 ________________________
@@ -58,7 +57,7 @@ sim_data_start_13_05_2019_12_58_end_13_05_2019_23_21_sim_total_corr_pure_ICA_09_
 
 _______________________
 
-Os scripts também retornam, ao final de sua execução, o tempo total decorrido, para dimensionamento de dimensões mais longas ou
+Os scripts também retornam, ao final de sua execução, o tempo total decorrido, para teste de ensaio em dimensões mais longas ou
 uma pré-estimativa do tempo necessário se quisermos mudar os parâmetros de simulações e/ou colocar mais trials, para uma medida mais
 fidedigna de estatística dos algoritmos.
 
