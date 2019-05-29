@@ -16,10 +16,15 @@ sim_data.n_sources = n_sources;
 sim_data.some_primes = some_primes;
 
 
+
+ 
+%% I'm having problems with the plots and utf-8...
+%% gonna try my best
+
 %%%%%%%% TRIAL TIME %%%%%%
 figure("visible","on")
 
-xlabel_str = 'K (dimension)';
+xlabel_str = 'K (dimensão)';
 
 %% maintaining the order of the markers, QICA is the third
 markers_list = {'o','+','*','x'}; 
@@ -40,15 +45,15 @@ for algo_i = 1:length(algorithms_str)
 		set(the_plot,'linestyle','-')
 		set(the_plot,'markersize',13)
 		set(gca,'fontsize',15)
-		set(legend,'fontsize',17)
+		set(legend,'fontsize',15)
 		legend ("location", "northeastoutside");
 		hold on
 
 end
 
-ylabel("algorithm mean time [s]");
+ylabel("média temporal do algoritmo[s]");
 xlabel(xlabel_str);
-the_str = sprintf("mean time: T = %d", n_samples(t_i));
+the_str = sprintf("média temporal: T = %d", n_samples(t_i));
 title(the_str);
     
 set(gca,"xtick",x);
@@ -63,13 +68,13 @@ for algo_i = 1:length(algorithms_str)
 	set(the_plot,'linestyle','--')
 	set(the_plot,'markersize',13)
 	set(gca,'fontsize',15)
-	set(legend,'fontsize',17)
+	set(legend,'fontsize',15)
 	legend ("location", "northeastoutside");
 	hold on
 
 end
 
-filename = sprintf("varying_K_mean_time_setup2.eps")
+filename = sprintf("varying_K_mean_time_setup2.svg")
 print(filename,"-color")
 
 
@@ -90,15 +95,15 @@ x = n_sources
 		set(the_plot,'linestyle','-')
 		set(the_plot,'markersize',13)
 		set(gca,'fontsize',15)
-		set(legend,'fontsize',17)
+		set(legend,'fontsize',15)
 		legend ("location", "northeastoutside");
 		hold on
 
 	end
 
-	ylabel("total correlation [bits]");
+	ylabel("correlação total [bits]");
 	xlabel(xlabel_str);
-	the_str = sprintf("mean Total Correlation: T = %d", n_samples(t_i));
+	the_str = sprintf("correlação total média T = %d", n_samples(t_i));
 	title(the_str);
         
 	set(gca,"xtick",x);
@@ -112,11 +117,13 @@ x = n_sources
 		set(the_plot,'linestyle','--')
 		set(the_plot,'markersize',13)
 		set(gca,'fontsize',15)
-		set(legend,'fontsize',17)
+		set(legend,'fontsize',15)
 		legend ("location", "northeastoutside");
 		hold on
 
 	end
 
-	filename = sprintf("varying_K_total_corr_setup2.eps")
+	filename = sprintf("varying_K_total_corr_setup2.svg")
 	print(filename, "-color")
+
+	disp("OBS: IT WILL NOT GENERATE NON-ASCII FONTS, THE EDIT WAS MANUAL ON .SVG FILE")

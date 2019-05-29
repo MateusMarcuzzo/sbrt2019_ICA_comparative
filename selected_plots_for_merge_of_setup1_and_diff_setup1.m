@@ -10,7 +10,7 @@ setup1.n_samples = n_samples;
 setup1.algorithms = algorithms_names;
 setup1.n_trials = n_trials;
 
-
+ 
 load('sim_data_start_18_05_2019_19_21_end_20_05_2019_01_16_sim_bss_and_total_corr_17_04_2019_diff_setup1')
 
 size_to_merge = [ 4 2 5 3];
@@ -58,282 +58,282 @@ for i=1:length(algorithms_names);
 end
 
 %% Here we'll do something close to the do_plots_of_sims_17_04_2019
-
-
+%% I'm having problems with the plots and utf-8...
+%% gonna try my best
 
 %%%%%%%%%%%%%% PLOT OF MEAN TIME VARYING K %%%%%%%%%%%%%% 
 %%%%%%%%%%% FIGURA 2 %%%%%%%%%%%%
-% figure('visible','on','name','varying K, mean time');
+figure('visible','on','name','varying K, mean time');
 
 
-% sim_data.bss = bss_overall;
-% sim_data.trial_time = trial_time_overall;
-% sim_data.total_corr = total_corr_results_overall;
-% sim_data.n_samples = n_samples_overall;
-% sim_data.n_sources = n_sources_overall;
-% sim_data.some_primes = some_primes_overall;
+sim_data.bss = bss_overall;
+sim_data.trial_time = trial_time_overall;
+sim_data.total_corr = total_corr_results_overall;
+sim_data.n_samples = n_samples_overall;
+sim_data.n_sources = n_sources_overall;
+sim_data.some_primes = some_primes_overall;
 
 
-% x = n_sources_overall
-% p_i =  2 %% prime = 3
-% t_i = 5 %% n_samples = 4096
-% k_i = 1:length(n_sources_overall)
+x = n_sources_overall
+p_i =  2 %% prime = 3
+t_i = 5 %% n_samples = 4096
+k_i = 1:length(n_sources_overall)
 
-% for i=1:length(algorithms_names);
-% 	algorithms_str{i} = sprintf(";%s",algorithms_names{i});
-% 	%% we will add something after the names
-% 	%% this is meant to be used as a legend
-% end
+for i=1:length(algorithms_names);
+	algorithms_str{i} = sprintf(";%s",algorithms_names{i});
+	%% we will add something after the names
+	%% this is meant to be used as a legend
+end
 
-% xlabel_str = 'number of sources';
+xlabel_str = 'número de fontes';
 
-% markers_list = {'o','+','x'}; 
-% color_list= {'blue','red','green'};
+markers_list = {'o','+','x'}; 
+color_list= {'blue','red','green'};
 
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s P = %d;",algorithms_str{algo_i},some_primes_overall(p_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','-')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-% 	legend ("location", "northeastoutside");
-% 	hold on
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s P = %d;",algorithms_str{algo_i},some_primes_overall(p_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','-')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	legend ("location", "northeastoutside");
+	hold on
 
-% end
+end
 
 
-% ylabel("algorithm mean time [s]");
-% xlabel(xlabel_str);
-% % the_str = sprintf("mean time: P = %d and T= %d",some_primes_overall(p_i),n_samples_overall(t_i));
-% the_str = sprintf("mean time of execution, P and T = %d fixed",n_samples_overall(t_i))
-% title(the_str);
+ylabel("média temporal do algoritmo [s]");
+xlabel(xlabel_str);
+% the_str = sprintf("mean time: P = %d and T= %d",some_primes_overall(p_i),n_samples_overall(t_i));
+the_str = sprintf("média temporal, P e T = %d fixos",n_samples_overall(t_i))
+title(the_str);
     
-% set(gca,"xtick",x);
-% set(gca,"xticklabel",x);
+set(gca,"xtick",x);
+set(gca,"xticklabel",x);
 
 
-% p_i = 3 %% now 5
+p_i = 3 %% now 5
 
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s P = %d;",algorithms_str{algo_i},some_primes_overall(p_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','--')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-% 	legend ("location", "northeastoutside");
-% 	hold on
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s P = %d;",algorithms_str{algo_i},some_primes_overall(p_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','--')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	legend ("location", "northeastoutside");
+	hold on
 
-% end
+end
 
-% p_i = 4 %% now it's 7
+p_i = 4 %% now it's 7
 
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s P = %d;",algorithms_str{algo_i},some_primes_overall(p_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','-.')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-% 	legend ("location", "northeastoutside");
-% 	hold on
-% end
-
-
-% filename = sprintf('varying_K_mean_time_merge_setup1.eps')
-% print(filename,'-color')
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s P = %d;",algorithms_str{algo_i},some_primes_overall(p_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','-.')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	legend ("location", "northeastoutside");
+	hold on
+end
 
 
-% %%%%%%%%%%%%% PLOT OF MEAN TIME VARYING P %%%%%%%%%%%%
-% %%%%%%% FIGURA 3%%%%%%%%
-
-% figure('visible','on','name','varying P, mean time');
+filename = sprintf('varying_K_mean_time_merge_setup1.svg')
+print(filename,'-color')
 
 
+%%%%%%%%%%%%% PLOT OF MEAN TIME VARYING P %%%%%%%%%%%%
+%%%%%%% FIGURA 3%%%%%%%%
 
-% sim_data.bss = bss_overall;
-% sim_data.trial_time = trial_time_overall;
-% sim_data.total_corr = total_corr_results_overall;
-% sim_data.n_samples = n_samples_overall;
-% sim_data.n_sources = n_sources_overall;
-% sim_data.some_primes = some_primes_overall;
+figure('visible','on','name','varying P, mean time');
 
 
-% x = some_primes_overall
-% p_i =  1:length(some_primes_overall) %% 
-% t_i = 5 %% n_samples = 4096
-% k_i = 4 % 5 sources
 
-% for i=1:length(algorithms_names);
-% 	algorithms_str{i} = sprintf(";%s",algorithms_names{i});
-% 	%% we will add something after the names
-% 	%% this is meant to be used as a legend
-% end
-
-% xlabel_str = 'the primes';
-
-% markers_list = {'o','+','x'}; 
-% color_list= {'blue','red','green'};
-
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s K = %d;",algorithms_str{algo_i},n_sources_overall(k_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','-')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',15)
-% 	%legend ("location", "northeastoutside");
-% 	hold on
-
-% end
+sim_data.bss = bss_overall;
+sim_data.trial_time = trial_time_overall;
+sim_data.total_corr = total_corr_results_overall;
+sim_data.n_samples = n_samples_overall;
+sim_data.n_sources = n_sources_overall;
+sim_data.some_primes = some_primes_overall;
 
 
-% ylabel("algorithm mean time [s]");
-% xlabel(xlabel_str);
-% % the_str = sprintf("mean time: P = %d and T= %d",some_primes_overall(p_i),n_samples_overall(t_i));
-% the_str = sprintf("mean time of execution, K and T = %d fixed",n_samples_overall(t_i))
-% title(the_str);
+x = some_primes_overall
+p_i =  1:length(some_primes_overall) %% 
+t_i = 5 %% n_samples = 4096
+k_i = 4 % 5 sources
+
+for i=1:length(algorithms_names);
+	algorithms_str{i} = sprintf(";%s",algorithms_names{i});
+	%% we will add something after the names
+	%% this is meant to be used as a legend
+end
+
+xlabel_str = 'números primos';
+
+markers_list = {'o','+','x'}; 
+color_list= {'blue','red','green'};
+
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s K = %d;",algorithms_str{algo_i},n_sources_overall(k_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','-')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	%legend ("location", "northeastoutside");
+	hold on
+
+end
+
+
+ylabel("média temporal do algoritmo [s]");
+xlabel(xlabel_str);
+% the_str = sprintf("mean time: P = %d and T= %d",some_primes_overall(p_i),n_samples_overall(t_i));
+the_str = sprintf("média temporal, K e T = %d fixos",n_samples_overall(t_i))
+title(the_str);
     
-% set(gca,"xtick",x);
-% set(gca,"xticklabel",x);
+set(gca,"xtick",x);
+set(gca,"xticklabel",x);
 
 
-% k_i = 5 %% now it's six
+k_i = 5 %% now it's six
 
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s K = %d;",algorithms_str{algo_i},n_sources_overall(k_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','--')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-% 	legend ("location", "northeastoutside");
-% 	hold on
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s K = %d;",algorithms_str{algo_i},n_sources_overall(k_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','--')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	legend ("location", "northeastoutside");
+	hold on
 
-% end
+end
 
-% k_i = 6 %% now it's seven
+k_i = 6 %% now it's seven
 
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s K = %d;",algorithms_str{algo_i},n_sources_overall(k_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','-.')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-% 	legend ("location", "northeastoutside");
-% 	hold on
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s K = %d;",algorithms_str{algo_i},n_sources_overall(k_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','-.')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	legend ("location", "northeastoutside");
+	hold on
 
-% end
+end
 
-% filename = sprintf('varying_P_mean_time_merge_setup1.eps')
-% print(filename,'-color')
+filename = sprintf('varying_P_mean_time_merge_setup1.svg')
+print(filename,'-color')
 
-% %%%%%%%%%%%%% PLOT OF MEAN TIME VARYING SAMPLES %%%%%%%%%%%%
-% %%%%%%% FIGURA 1 %%%%%%%%
-
-
-
-% figure('visible','on','name','varying n_samples, mean time');
-
-
-% sim_data.bss = bss_overall;
-% sim_data.trial_time = trial_time_overall;
-% sim_data.total_corr = total_corr_results_overall;
-% sim_data.n_samples = n_samples_overall;
-% sim_data.n_sources = n_sources_overall;
-% sim_data.some_primes = some_primes_overall;
-
-
-% x = n_samples_overall
-% p_i =  3 %% P = 7 
-% t_i = 1:length(n_samples_overall) %% n_samples = 4096
-% k_i = 4 % 5 sources
-
-% for i=1:length(algorithms_names);
-% 	algorithms_str{i} = sprintf(";%s",algorithms_names{i});
-% 	%% we will add something after the names
-% 	%% this is meant to be used as a legend
-% end
-
-% xlabel_str = 'log2(number of samples)';
-
-% markers_list = {'o','+','x'}; 
-% color_list= {'blue','red','green'};
+%%%%%%%%%%%%% PLOT OF MEAN TIME VARYING SAMPLES %%%%%%%%%%%%
+%%%%%%% FIGURA 1 %%%%%%%%
 
 
 
+figure('visible','on','name','varying n_samples, mean time');
 
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s P = %d, K = %d;",algorithms_str{algo_i},some_primes_overall(p_i),n_sources_overall(k_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','-')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-% 	legend ("location", "northeastoutside");
-% 	hold on
 
-% end
+sim_data.bss = bss_overall;
+sim_data.trial_time = trial_time_overall;
+sim_data.total_corr = total_corr_results_overall;
+sim_data.n_samples = n_samples_overall;
+sim_data.n_sources = n_sources_overall;
+sim_data.some_primes = some_primes_overall;
+
+
+x = n_samples_overall
+p_i =  3 %% P = 7 
+t_i = 1:length(n_samples_overall) %% n_samples = 4096
+k_i = 4 % 5 sources
+
+for i=1:length(algorithms_names);
+	algorithms_str{i} = sprintf(";%s",algorithms_names{i});
+	%% we will add something after the names
+	%% this is meant to be used as a legend
+end
+
+xlabel_str = 'log2(número de amostras)';
+
+markers_list = {'o','+','x'}; 
+color_list= {'blue','red','green'};
 
 
 
 
-% ylabel("algorithm mean time [s]");
-% xlabel(xlabel_str);
-% % the_str = sprintf("mean time: P = %d and T= %d",some_primes_overall(p_i),n_samples_overall(t_i));
-% the_str = sprintf("mean time of execution, K and P = %d fixed",some_primes_overall(p_i))
-% title(the_str);
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s P = %d, K = %d;",algorithms_str{algo_i},some_primes_overall(p_i),n_sources_overall(k_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','-')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	legend ("location", "northeastoutside");
+	hold on
+
+end
+
+
+
+
+ylabel("média temporal do algoritmo [s]");
+xlabel(xlabel_str);
+% the_str = sprintf("mean time: P = %d and T= %d",some_primes_overall(p_i),n_samples_overall(t_i));
+the_str = sprintf("média temporal, K e P = %d fixos",some_primes_overall(p_i))
+title(the_str);
     
-% set(gca,"xtick",x);
-% set(gca,"xticklabel",log2(x));
-% %set(gca,'xticklabelrotation',30); %not implemented yet
+set(gca,"xtick",x);
+set(gca,"xticklabel",log2(x));
+%set(gca,'xticklabelrotation',30); %not implemented yet
 
-% p_i = 3 %% P=7 does not have this data, so we choose for 5
-% k_i = 5 %% now it's six
+p_i = 3 %% P=7 does not have this data, so we choose for 5
+k_i = 5 %% now it's six
 
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s P = %d, K = %d;",algorithms_str{algo_i},some_primes_overall(p_i),n_sources_overall(k_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','--')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-% 	legend ("location", "northeastoutside");
-% 	hold on
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s P = %d, K = %d;",algorithms_str{algo_i},some_primes_overall(p_i),n_sources_overall(k_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','--')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
+	legend ("location", "northeastoutside");
+	hold on
 
-% end
-
-
-% k_i = 6 %% now it's seven
-
-% for algo_i = 1:length(algorithms_str)
-% 	the_legend = sprintf("%s P = %d, K = %d;",algorithms_str{algo_i},some_primes_overall(p_i),n_sources_overall(k_i))
-% 	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
-% 	set(the_plot,'linewidth',2)
-% 	set(the_plot,'linestyle','-.')
-% 	set(the_plot,'markersize',13)
-% 	set(gca,'fontsize',15)
-% 	set(legend,'fontsize',17)
-
-% 	legend ("location", "northeastoutside");
+end
 
 
-% 	hold on
+k_i = 6 %% now it's seven
 
-% end
+for algo_i = 1:length(algorithms_str)
+	the_legend = sprintf("%s P = %d, K = %d;",algorithms_str{algo_i},some_primes_overall(p_i),n_sources_overall(k_i))
+	the_plot = semilogy(x,sim_data.trial_time(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+	set(the_plot,'linewidth',2)
+	set(the_plot,'linestyle','-.')
+	set(the_plot,'markersize',13)
+	set(gca,'fontsize',15)
+	set(legend,'fontsize',15)
 
-% filename = sprintf('varying_T_mean_time_merge_setup1.eps')
-% print(filename,'-color')
+	legend ("location", "northeastoutside");
+
+
+	hold on
+
+end
+
+filename = sprintf('varying_T_mean_time_merge_setup1.svg')
+print(filename,'-color')
 
 %%%%%%%%%% GRÁFICO DE BSS AQUI %%%%%%%%%
 
@@ -356,7 +356,7 @@ x = n_sources_overall
 t_i = 1 %% n_samples = 256
 k_i = 1:length(n_sources_overall)
 
-xlabel_str = 'number of sources';
+xlabel_str = 'número de fontes';
 
 for i=1:length(algorithms_names);
 	algorithms_str{i} = sprintf(";%s",algorithms_names{i});
@@ -367,39 +367,64 @@ markers_list = {'o','+','x'};
 color_list= {'blue','red','green'};
 
 figure('visible','on','name','varying K, many plots, BSS_succ');
-for plot_index=1:5
-	t_i = plot_index
-	subplot(3,2,plot_index)
+
+t_i = 1
+for plot_index=1:4
+
+	subplot(2,2,plot_index)
 
 
 	for algo_i = 1:length(algorithms_str)
 		for p_i = 1:length(some_primes_overall)
-			the_legend = sprintf("%s P = %d;",algorithms_str{algo_i},some_primes_overall(p_i))
-			the_plot = plot(x,sim_data.bss(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+			if p_i == 1 %%% I just want one legend...
+				the_legend = sprintf("%s;",algorithms_str{algo_i})
+				the_plot = plot(x,sim_data.bss(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color",color_list{algo_i});
+			else
+				the_plot = plot(x,sim_data.bss(p_i,k_i,t_i,algo_i),"marker",markers_list{algo_i},"color",color_list{algo_i});			
+			end
 			set(the_plot,'markersize',13)
-			legend("hide")
+			set(the_plot,'linewidth',2);
+			legend("show")
+			legend("boxoff")
+			set(legend,'fontsize',15)
+
+			if t_i ~= 5
+				legend("hide")
+				
+			end
+
+			legend ("location", "northeastoutside");
+			
 			hold on
 		end
 
 	end
 
 
-	ylabel("BSS success rate");
+	ylabel("Taxa de sucesso, BSS");
 	xlabel(xlabel_str);
 	% the_str = sprintf("mean time: P = %d and T= %d",some_primes_overall(p_i),n_samples_overall(t_i));
-	the_str = sprintf("BSS success rate, many P and T = %d fixed",n_samples_overall(t_i))
+	the_str = sprintf("cada P e T = %d fixos",n_samples_overall(t_i))
 	title(the_str);
 
 
 	% legend("america","sa4ica","GLICA")
 	% legend ("location", "eastoutside");
-	    
+    
 	set(gca,"xtick",x);
 	set(gca,"xticklabel",x);
+	t_i +=1
+	if t_i == 3 %% we dont want 1024 samples to show.
+		t_i+=1
+	end
 end
 
-%%% Isso aqui é uma tnetativa de botar a legenda na posição 6 dos subplots
- subplot(3,2,6)
+filename = sprintf('varying_K_bss_succ_merge_setup1.svg')
+print(filename,'-color')
+
+
+%%% Este é o gráfico de TOTAL CORRELATION %%%
+figure("visible","on")
 
 p_i = 3 % prime is 5, seven wasn't measured
 t_i = 5 % 4096 samples
@@ -410,20 +435,24 @@ for algo_i=1:length(algorithms_str)
 	the_plot = plot(x, sim_data.total_corr(p_i,k_i,t_i,algo_i),the_legend,"marker",markers_list{algo_i},"color", color_list{algo_i} );
 	
 	set(the_plot,'markersize',13)
+	set(the_plot,'linewidth',2);
+	set(gca,'fontsize',15)
+
 	hold on
 end
 
-the_str = sprintf("\tTotal Correlation, P = %d, T = %d",some_primes_overall(p_i),n_samples_overall(t_i))
+the_str = sprintf("correlação total, P = %d, T = %d",some_primes_overall(p_i),n_samples_overall(t_i))
 title(the_str)
-ylabel("Total Correlation [bits]");
+ylabel("correlação total [bits]");
 xlabel(xlabel_str)
 
-set(legend,"fontsize",13)
-legend("location","eastoutside")
-legend("boxoff")
+set(legend,'fontsize',15)
+legend("location","northeastoutside")
+%%legend("boxoff")
 
-% set(legend,"box","off")
+
 % legend("location","west")
-
-filename = sprintf('varying_K_bss_succ_merge_setup1.eps')
+filename = sprintf('varying_K_total_corr_merge_setup1.svg')
 print(filename,'-color')
+
+disp("OBS: IT WILL NOT GENERATE NON-ASCII FONTS, THE EDIT WAS MANUAL ON .SVG FILE")
