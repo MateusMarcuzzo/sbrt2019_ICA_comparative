@@ -2,6 +2,9 @@
 % not QICA_function.m !
 clear;
 
+% 16/09/2019
+% adding these comments to prevent future problems
+% This is the pure Zipf pmf simulation.
 
 sim_start_time = localtime(time());
 
