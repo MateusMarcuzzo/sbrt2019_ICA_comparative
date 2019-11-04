@@ -28,8 +28,8 @@ sim_start_time = localtime(time());
 
 % diff_setup1 part3
 % just P=5 and K=7
-some_primes = [5];
-n_sources = [7];
+%some_primes = [5];
+%n_sources = [7];
 
 
 % diff2_setup1

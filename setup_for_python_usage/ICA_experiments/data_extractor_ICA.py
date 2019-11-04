@@ -13,7 +13,9 @@ from itertools import product
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import wilcoxon
+from scipy.stats import t
 
+pd.set_option('display.max_rows', 500)
 
 # The colors were too close
 # plt.style.use('ggplot')
@@ -39,6 +41,7 @@ rows_list = []
 # ICA_shuffled_zipf.mat
 # ICA_random_pmf.mat
 # ICA_pure_zipf.mat
+# ICA_pure_zipf_10trials.mat
 # ICA_binomialp02.mat
 # ICA_binomialp03.mat
 # ICA_binomialp04.mat
@@ -46,10 +49,12 @@ rows_list = []
 # ICA_binomialp06.mat
 # ICA_binomialp07.mat
 # ICA_binomialp08.mat
+
       
 setups_names = ['ICA_shuffled_zipf.mat',
                 'ICA_random_pmf.mat',
                 'ICA_pure_zipf.mat',
+                'ICA_pure_zipf_10trials.mat',
                 'ICA_binomialp02.mat',
                 'ICA_binomialp03.mat',
                 'ICA_binomialp04.mat',
@@ -112,7 +117,10 @@ for some_setup in setups_names:
         temp_dict.update({'algorithm_name': row[3]})
     
         # removing ICA_ from the name and the trailing .mat
-        temp_dict.update({'distribution': str(some_setup)[4:-4]})
+        if(some_setup != 'ICA_pure_zipf_10trials.mat' ):
+            temp_dict.update({'distribution': str(some_setup)[4:-4]})
+        else:
+            temp_dict.update({'distribution':str(some_setup)[4:-13]})
         
         # I've put some .copy() at the end, and It seems that it worked
         # It was giving some problems without it
@@ -284,117 +292,383 @@ trial_dir = 'trial_time_plots'
 T_var_dir = 'T_var'
 K_var_dir = 'K_var'
 P_var_dir = 'P_var'
+dist_var_dir = 'dist_var'
 
+marker = {'america':'x','GLICA':'o','sa4ica':'*','QICA':'^'}
+
+from time import sleep
+
+confidence = 0.95
+p = 1-confidence
+def plot_K_var_total_corr(slack_time=0):
+    
+    for dist in df.distribution.unique():
+        for prime in df.prime.unique():
+            for sample in df.n_samples.unique():
+               fig = plt.figure()
+               
+               for algorithm in df.algorithm_name.unique():
+               
+                   title= 'Correlação Total com K variando, P = {}, T = {} fixos\n Distribuição {}, Confiança {}%'.format(prime,sample,dist,confidence*100)
+                   # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+                   x = df.dimension.unique()
+                   
+                   y = np.array(dfgroupby.mean().loc[idx[prime,:,sample,algorithm,dist],'total_corr'].unstack(level=['prime','n_samples','algorithm_name','distribution']))
+                   y = y.flatten()
+                   
+                   yerr = np.array(dfgroupby_errors.loc[idx[prime,:,sample,algorithm,dist],'total_corr'].unstack(level=['prime','n_samples','algorithm_name','distribution']))
+                   
+                   c_interval = t_inv_2tail(p,len(y))
+                   yerr = c_interval*yerr.flatten()
+                   
+                   plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+                   plt.title(title)
+                   plt.ylabel('Correlação Total [bits]')
+                   plt.xlabel('K')
+                   plt.xticks(x)
+                   # https://stackoverflow.com/a/36646298/1644727, this may be useful
+                   plt.legend()
+
+    
+                   
+               fig = plt.gcf()
+               fig.savefig('{}\{}\P{}T{}{}.pdf'.format(total_corr_dir,K_var_dir,prime,sample,dist))
+              
+               
+               plt.show()
+               sleep(slack_time)
+
+def plot_K_var_trial_time(slack_time=0):
+    for dist in df.distribution.unique():
+        for prime in df.prime.unique():
+            for sample in df.n_samples.unique():
+               fig = plt.figure()
+               
+               for algorithm in df.algorithm_name.unique():
+               
+                   title= 'Tempo da trial com K variando, P = {}, T = {} fixos\n Distribuição {}, Confiança {}%'.format(prime,sample,dist,confidence*100)
+                   # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+                   x = df.dimension.unique()
+                   
+                   y = np.array(dfgroupby.mean().loc[idx[prime,:,sample,algorithm,dist],'trial_time'].unstack(level=['prime','n_samples','algorithm_name','distribution']))
+                   y = y.flatten()
+                   
+                   yerr = np.array(dfgroupby_errors.loc[idx[prime,:,sample,algorithm,dist],'trial_time'].unstack(level=['prime','n_samples','algorithm_name','distribution']))
+                  
+                   c_interval = t_inv_2tail(p,len(y))
+                   yerr = c_interval*yerr.flatten()
+                   
+                   plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+                   plt.title(title)
+                   plt.ylabel('Tempo da trial [s]')
+                   plt.yscale('log')
+                   plt.xlabel('K')
+                   plt.xticks(x)
+                   # https://stackoverflow.com/a/36646298/1644727, this may be useful
+                   plt.legend()
+    
+    
+                   
+               fig = plt.gcf()
+               fig.savefig('{}\{}\P{}T{}{}.pdf'.format(trial_dir,K_var_dir,prime,sample,dist))
+              
+               
+               plt.show()
+               sleep(slack_time)
+               
+               
+def plot_P_var_total_corr(slack_time=0):
+    for dist in df.distribution.unique():
+        for dim in df.dimension.unique():
+            for sample in df.n_samples.unique():
+               fig = plt.figure()
+               
+               for algorithm in df.algorithm_name.unique():
+               
+                   title= 'Correlação Total com P variando, K = {}, T = {} fixos\n Distribuição {}, Confiança {}%'.format(dim,sample,dist,confidence*100)
+                   # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+                   x = df.prime.unique()
+                   
+                   
+                   # Some strange behaviour here.
+                   #It was saying the y and yerr did not have same len. 
+                   #So...we did flatten, Also for all other function
+                   y = np.array(dfgroupby.mean().loc[idx[:,dim,sample,algorithm,dist],'total_corr'].unstack(level=['dimension','n_samples','algorithm_name','distribution']))
+                   y = y.flatten()
+                   yerr = np.array(dfgroupby_errors.loc[idx[:,dim,sample,algorithm,dist],'total_corr'].unstack(level=['dimension','n_samples','algorithm_name','distribution']))
+                   
+                                     
+                   c_interval = t_inv_2tail(p,len(y))
+                   yerr = c_interval*yerr.flatten()
+                   
+                   
+                   plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+                   plt.title(title)
+                   plt.ylabel('Correlação Total [bits]')
+                   plt.xlabel('P')
+                   plt.xticks(x)
+                   # https://stackoverflow.com/a/36646298/1644727, this may be useful
+                   plt.legend()
+    
+    
+                   
+               fig = plt.gcf()
+               fig.savefig('{}\{}\K{}T{}{}.pdf'.format(total_corr_dir,P_var_dir,dim,sample,dist))
+              
+           
+               plt.show()
+               sleep(slack_time)
+               
+def plot_P_var_trial_time(slack_time=0):
+    for dist in df.distribution.unique():
+        for dim in df.dimension.unique():
+            for sample in df.n_samples.unique():
+               fig = plt.figure()
+               
+               for algorithm in df.algorithm_name.unique():
+               
+                   title= 'Tempo da trial com P variando, K = {}, T = {} fixos\n Distribuição {}, Confiança {}%'.format(dim,sample,dist,confidence*100)
+                   # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+                   x = df.prime.unique()
+                   
+                   
+                   # Some strange behaviour here.
+                   #It was saying the y and yerr did not have same len. 
+                   #So...we did flatten, Also for all other function
+                   y = np.array(dfgroupby.mean().loc[idx[:,dim,sample,algorithm,dist],'trial_time'].unstack(level=['dimension','n_samples','algorithm_name','distribution']))
+                   y = y.flatten()
+                   yerr = np.array(dfgroupby_errors.loc[idx[:,dim,sample,algorithm,dist],'trial_time'].unstack(level=['dimension','n_samples','algorithm_name','distribution']))
+                                    
+                   c_interval = t_inv_2tail(p,len(y))
+                   yerr = c_interval*yerr.flatten()
+                   
+                   
+                   plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+                   plt.title(title)
+                   plt.ylabel('Tempo da trial [s]')
+                   plt.yscale('log')
+                   plt.xlabel('P')
+                   plt.xticks(x)
+                   # https://stackoverflow.com/a/36646298/1644727, this may be useful
+                   plt.legend()
+    
+    
+                   
+               fig = plt.gcf()
+               fig.savefig('{}\{}\K{}T{}{}.pdf'.format(trial_dir,P_var_dir,dim,sample,dist))
+             
+           
+               plt.show()
+               sleep(slack_time)
+
+def plot_T_var_total_corr(slack_time=0):
+    for dist in df.distribution.unique():
+        for dim in df.dimension.unique():
+            for prime in df.prime.unique():
+               fig = plt.figure()
+               
+               for algorithm in df.algorithm_name.unique():
+               
+                   title= 'Correlação Total com T variando, P = {}, K = {} fixos\n Distribuição {}, Confiança {}%'.format(prime,dim,dist,confidence*100)
+                   # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+                   x = df.n_samples.unique()
+                   
+                   
+                   # Some strange behaviour here.
+                   #It was saying the y and yerr did not have same len. 
+                   #So...we did flatten, Also for all other function
+                   y = np.array(dfgroupby.mean().loc[idx[prime,dim,:,algorithm,dist],'total_corr'].unstack(level=['prime','dimension','algorithm_name','distribution']))
+                   y = y.flatten()
+                   yerr = np.array(dfgroupby_errors.loc[idx[prime,dim,:,algorithm,dist],'total_corr'].unstack(level=['prime','dimension','algorithm_name','distribution']))
+                                   
+                   c_interval = t_inv_2tail(p,len(y))
+                   yerr = c_interval*yerr.flatten()
+                   
+                   
+                   plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+                   plt.title(title)
+                   plt.ylabel('Correlação Total [bits]')
+                   plt.xlabel('T')
+                   plt.xticks(x)
+                   # https://stackoverflow.com/a/36646298/1644727, this may be useful
+                   plt.legend()
+    
+    
+                   
+               fig = plt.gcf()
+               fig.savefig('{}\{}\P{}K{}{}.pdf'.format(total_corr_dir,T_var_dir,prime,dim,dist))
+               
+           
+               plt.show()
+               sleep(slack_time)
+
+def plot_T_var_trial_time(slack_time=0):    
+    for dist in df.distribution.unique():
+        for dim in df.dimension.unique():
+            for prime in df.prime.unique():
+               fig = plt.figure()
+               
+               for algorithm in df.algorithm_name.unique():
+               
+                   title= 'Tempo da trial com T variando,P = {}, K = {} fixos\n Distribuição {}, Confiança {}%'.format(prime,dim,dist,confidence*100)
+                   # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+                   x = df.n_samples.unique()
+                   
+                   
+                   # Some strange behaviour here.
+                   #It was saying the y and yerr did not have same len. 
+                   #So...we did flatten, Also for all other function
+                   y = np.array(dfgroupby.mean().loc[idx[prime,dim,:,algorithm,dist],'trial_time'].unstack(level=['prime','dimension','algorithm_name','distribution']))
+                   y = y.flatten()
+                   yerr = np.array(dfgroupby_errors.loc[idx[prime,dim,:,algorithm,dist],'trial_time'].unstack(level=['prime','dimension','algorithm_name','distribution']))
+                   
+                                     
+                   c_interval = t_inv_2tail(p,len(y))
+                   yerr = c_interval*yerr.flatten()
+                   
+                   
+                   plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+                   plt.title(title)
+                   plt.ylabel('Tempo da trial [s]')
+                   plt.yscale('log')
+                   plt.xlabel('T')
+                   plt.xticks(x)
+                   # https://stackoverflow.com/a/36646298/1644727, this may be useful
+                   plt.legend()
+    
+    
+                   
+               fig = plt.gcf()
+               fig.savefig('{}\{}\P{}K{}{}.pdf'.format(trial_dir,T_var_dir,prime,dim,dist))
+               
+           
+               plt.show()
+               sleep(slack_time)
+        
+ #TODO
+def plot_dist_var_total_corr(slack_time=0):
+    # We add this, because when saving it was cutting the x_labels
+    bbox_inches = 'tight'
+    distributions = df.distribution.unique()
+    distributions = np.sort(distributions)
+    for sample in df.n_samples.unique():
+        for dim in df.dimension.unique():
+            for prime in df.prime.unique():
+                fig = plt.figure()
+                x_dif = 0
+                for algorithm in df.algorithm_name.unique():
+               
+                   x_dif+=1
+                   title= 'Correlação Total com distribuição variando\n P = {}, K = {}, T={} fixos'.format(prime,dim,sample)
+                   # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+                   xlabels = distributions
+                   x = np.linspace(1,20,num=10)
+                   
+     
+                   # Some strange behaviour here.
+                   #It was saying the y and yerr did not have same len. 
+                   #So...we did flatten, Also for all other function
+                   y = np.array(dfgroupby.mean().loc[idx[prime,dim,sample,algorithm,:],'total_corr'].unstack(level=['prime','dimension','n_samples','algorithm_name']))
+                   y = y.flatten()
+                   yerr = np.array(dfgroupby_errors.loc[idx[prime,dim,sample,algorithm,:],'total_corr'].unstack(level=['prime','dimension','n_samples','algorithm_name']))
+                                     
+                   c_interval = t_inv_2tail(p,len(y))
+                   yerr = c_interval*yerr.flatten()
+                   
+                   
+                   plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+                   #plt.bar(x+x_dif,y,yerr=yerr,align='edge',tick_label=xlabels)
+                   plt.title(title)
+                   plt.ylabel('Correlação Total [bits]')
+                   
+                   plt.xlabel('distribuição')
+                   plt.xticks(x,labels = xlabels,rotation=60)
+                   
+                   # https://stackoverflow.com/a/36646298/1644727, this may be useful
+                   plt.legend()
+    
+    
+                   
+                fig = plt.gcf()
+                fig.savefig('{}\{}\P{}K{}T{}.pdf'.format(total_corr_dir,dist_var_dir,prime,dim,sample),bbox_inches=bbox_inches)
+                
+           
+                plt.show()
+                sleep(slack_time)
+
+from collections import Counter
+def show_where_algorithm_is_min_total_corr(algorithm):
+    min_list = []
+    for prime in df.prime.unique():
+        for dim in df.dimension.unique():
+            for sample in df.n_samples.unique():
+                min_list.append(dfgroupby.mean().loc[idx[prime,dim,sample,algorithm,:]]['total_corr'].idxmin()[4])
+                
+    print(Counter(min_list))
+    
+def show_where_algorithm_is_max_total_corr(algorithm):
+    max_list = []
+    for prime in df.prime.unique():
+        for dim in df.dimension.unique():
+            for sample in df.n_samples.unique():
+                max_list.append(dfgroupby.mean().loc[idx[prime,dim,sample,algorithm,:]]['total_corr'].idxmax()[4])
+                
+    print(Counter(max_list))
+
+def product_mean_on_algorithms():
+    total_corrmean = dfgroupby.mean()['total_corr']
+    trial_timemean = dfgroupby.mean()['trial_time']
+    product_mean = total_corrmean * trial_timemean
+    
+    print(product_mean.mean(level=3))
+    
+    
+# https://medium.com/@SciencelyYours/errors-bars-standard-errors-and-confidence-intervals-on-line-and-bar-graphics-matlab-254d6aa32b76
+# https://stackoverflow.com/questions/19339305/python-function-to-get-the-t-statistic
+    
+def t_inv_2tail(p,n):
+    # p is live: p<0,05, so you would put if you want confidence of 
+    # 0.95 = 95%
+    # confidence = 1 - p
+    return(t.ppf(1-p/2,n-1))
+    
+def t_inv_singletail(p,n):
+    # p is live: p<0,05, so you would put if you want confidence of 
+    # 0.95 = 95%
+    # confidence = 1 - p
+    return(t.ppf(1-p,n-1))
+
+
+# slack_time seconds interval between plots
+slack_time = 0
 if do_plot == True:
     # K variando P e T fixos!
-    # plots for total corr
-    for dist in df.distribution.unique():
-        for prime in df.prime.unique():
-            for sample in df.n_samples.unique():
-               fig = plt.figure()
-               # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
-               ax = dfgroupby.mean().loc[idx[prime,:,sample,:,dist],'total_corr'].unstack(level=['prime','n_samples','algorithm_name','distribution']).plot(title='Correlação Total com K variando \n P = {}, T = {} fixos, Distribuição {}'.format(prime,sample,dist),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,:,sample,:,dist],'total_corr'].unstack(level=['prime','n_samples','algorithm_name','distribution']))
-               ax.set(ylabel = 'Correlação Total [bits]')
-
-               # https://stackoverflow.com/a/36646298/1644727, this may be useful
-               
-               ax.set_xticks(df.dimension.unique())
-
-               
-               fig = ax.get_figure()
-               fig.savefig('{}\{}\P{}T{}{}'.format(total_corr_dir,K_var_dir,prime,sample,dist))
-               fig.savefig('{}\{}\P{}T{}{}.eps'.format(total_corr_dir,K_var_dir,prime,sample,dist))
-               
-               plt.show()
+    # plots for total corr        
+    plot_K_var_total_corr(slack_time)
             
     #plots for trial time
-    for dist in df.distribution.unique():
-        for prime in df.prime.unique():
-            for sample in df.n_samples.unique():
-               fig = plt.figure()
-               ax = dfgroupby.mean().loc[idx[prime,:,sample,:,dist],'trial_time'].unstack(level=['prime','n_samples','algorithm_name','distribution']).plot(title='Tempo da trial com K variando \n P = {}, T = {} fixos, Distribuição {}'.format(prime,sample,dist),linewidth=3, marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,:,sample,:,dist],'trial_time'].unstack(level=['prime','n_samples','algorithm_name','distribution']))
-               ax.set(ylabel = 'Tempo da trial [s]')
-               ax.set(yscale='log')
-
-               ax.set_xticks(df.dimension.unique())                          
-               fig = ax.get_figure()
-               fig.savefig('{}\{}\P{}T{}{}'.format(trial_dir,K_var_dir,prime,sample,dist))
-               fig.savefig('{}\{}\P{}T{}{}.eps'.format(trial_dir,K_var_dir,prime,sample,dist))
-     
-               
-               plt.show()
-               
-    # P variando K e T fixos!
+    plot_K_var_trial_time(slack_time)
+         
+    
+    # P variando K e T fixos!     
     # plots for total corr
-    for dist in df.distribution.unique():
-        for dim in df.dimension.unique():
-            for sample in df.n_samples.unique():
-               fig = plt.figure()
-               
-               ax = dfgroupby.mean().loc[idx[:,dim,sample,:,dist],'total_corr'].unstack(level=['dimension','n_samples','algorithm_name','distribution']).plot(title='Correlação Total com P variando \n K = {}, T = {} fixos, Distribuição {}'.format(dim,sample,dist),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[:,dim,sample,:,dist],'total_corr'].unstack(level=['dimension','n_samples','algorithm_name','distribution']))
-               ax.set(ylabel = 'Correlação Total [bits]')
-               ax.set_xticks(df.prime.unique())
-                        
-               fig = ax.get_figure()
-               fig.savefig('{}\{}\K{}T{}{}'.format(total_corr_dir,P_var_dir,dim,sample,dist))
-               fig.savefig('{}\{}\K{}T{}{}.eps'.format(total_corr_dir,P_var_dir,dim,sample,dist))
-           
-               
-               plt.show()
-            
-    #plots for trial time
-    for dist in df.distribution.unique():
-        for dim in df.dimension.unique():
-            for sample in df.n_samples.unique():
-               fig = plt.figure()
-               ax = dfgroupby.mean().loc[idx[:,dim,sample,:,dist],'trial_time'].unstack(level=['dimension','n_samples','algorithm_name','distribution']).plot(title='Tempo da trial com P variando \n K = {}, T = {} fixos, Distribuição {}'.format(dim,sample,dist),linewidth=3, marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[:,dim,sample,:,dist],'trial_time'].unstack(level=['dimension','n_samples','algorithm_name','distribution']))
-               ax.set(ylabel = 'Tempo da trial [s]')
-               ax.set(yscale='log')
-               ax.set_xticks(df.prime.unique())
-                           
-               fig = ax.get_figure()
-               fig.savefig('{}\{}\K{}T{}{}'.format(trial_dir,P_var_dir,dim,sample,dist))
-               fig.savefig('{}\{}\K{}T{}{}.eps'.format(trial_dir,P_var_dir,dim,sample,dist))
-               
-               
-               plt.show()
-               
+    plot_P_var_total_corr(slack_time)
+   
+    # plots for trial time
+    plot_P_var_trial_time(slack_time)
+    
     # T variando P e T fixos!
     # plots for total corr
-    for dist in df.distribution.unique():
-        for dim in df.dimension.unique():
-            for prime in df.prime.unique():
-               fig = plt.figure()
-              
-               ax = dfgroupby.mean().loc[idx[prime,dim,:,:,dist],'total_corr'].unstack(level=['prime','dimension','algorithm_name','distribution']).plot(title='Correlação Total com T variando \n P = {}, K = {} fixos, Distribuição {}'.format(prime,dim,dist),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,dim,:,:,dist],'total_corr'].unstack(level=['prime','dimension','algorithm_name','distribution']))
-               ax.set(ylabel = 'Correlação Total [bits]')
-               ax.set_xticks(df.n_samples.unique())
-                         
-               fig = ax.get_figure()
-               fig.savefig('{}\{}\K{}P{}{}'.format(total_corr_dir,T_var_dir,dim,prime,dist))
-               fig.savefig('{}\{}\K{}P{}{}.eps'.format(total_corr_dir,T_var_dir,dim,prime,dist))
-              
-               
-               plt.show()
-            
+    plot_T_var_total_corr(slack_time)
+    
+
+
     #plots for trial time
-    for dist in df.distribution.unique():
-        for dim in df.dimension.unique():
-            for prime in df.prime.unique():
-               fig = plt.figure()
-               ax = dfgroupby.mean().loc[idx[prime,dim,:,:,dist],'trial_time'].unstack(level=['prime','dimension','algorithm_name','distribution']).plot(title='Tempo da trial com T variando \n P = {}, K = {} fixos, Distribuição {}'.format(prime,dim,dist),linewidth=3, marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,dim,:,:,dist],'trial_time'].unstack(level=['prime','dimension','algorithm_name','distribution']))
-               ax.set(ylabel = 'Tempo da trial [s]')
-               ax.set(yscale='log')
-               ax.set_xticks(df.n_samples.unique())
-                           
-               
-               fig = ax.get_figure()
-               fig.savefig('{}\{}\K{}P{}{}'.format(trial_dir,T_var_dir,dim,prime,dist))
-               fig.savefig('{}\{}\K{}P{}{}.eps'.format(trial_dir,T_var_dir,dim,prime,dist))
-           
-               
-               plt.show()
-               
+    plot_T_var_trial_time(slack_time)
+    
+    plot_dist_var_total_corr(slack_time)
+    
+
                
 ## 16/10/2019 starting the Wilcoxon tests, now.
                
@@ -406,6 +680,9 @@ def select_trials_from(df,prime,dimension,n_samples,algorithm,distribution,the_c
               (df.distribution==distribution)
               ][the_col]
  
+    
+def select_all_P_mean_cases_from(dfgroupbymean,prime,algorithm,column):
+    return dfgroupbymean.loc[idx[prime,:,:,algorithm,:],column]
 ### 20/10/2019
     # important command to check stuff:
 #dfgroupbymean_total_corr = dfgroupby.mean().loc[idx[:,:,:,:,:],'total_corr'].unstack(level='algorithm_name')
@@ -419,21 +696,42 @@ def select_trials_from(df,prime,dimension,n_samples,algorithm,distribution,the_c
 
 ## Testing america vs QICA on total_corr test less
 
+# 26/10/2019 Comentado, por enquanto
+    
 zero_method = 'wilcox'  
 alternative = 'less'
-algo1 = 'sa4ica'
+algo1 = 'america'
 algo2 = 'QICA'
-print('wilcoxon test for {} vs {} on total_corr, test {}'.format(algo1,algo2,alternative))  
+target_value = 'total_corr'
+print('wilcoxon test for {} vs {} on {}, test {}'.format(algo1,algo2,target_value,alternative))  
 for prime in df.prime.unique():
     for dim in df.dimension.unique():
         for sample in df.n_samples.unique():
             for dist in df.distribution.unique():
-                x = np.array(select_trials_from(df,prime,dim,sample,algo1,dist,'total_corr'))
-                y = np.array(select_trials_from(df,prime,dim,sample,algo2,dist,'total_corr'))
+                x = np.array(select_trials_from(df,prime,dim,sample,algo1,dist,target_value))
+                y = np.array(select_trials_from(df,prime,dim,sample,algo2,dist,target_value))
                 
                 try:
-                    print('wilcoxon test on P={},K={},T={},dist={}'.format(prime,dim,sample,dist))
+                   
                     result = wilcoxon(x,y,zero_method=zero_method,alternative=alternative)
-                    print(result)
+                    if(result[1] < 0.05):
+                         print('wilcoxon test on P={},K={},T={},dist={}'.format(prime,dim,sample,dist))
+                         print(result)
                 except:
                     pass
+                
+                
+                
+print('\n wilcoxon for P_mean {} vs {} on {}, test {}'.format(algo1,algo2,target_value,alternative))  
+for prime in df.prime.unique():
+    x = select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo1,target_value)
+    y = select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo2,target_value)
+    try:
+        result = wilcoxon(x,y,zero_method=zero_method,alternative=alternative)
+        
+        if(result[1] < 0.05):
+            print('wilcoxon test on P={}'.format(prime))
+            print(result)
+        
+    except:
+        pass

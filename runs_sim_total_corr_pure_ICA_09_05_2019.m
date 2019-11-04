@@ -17,7 +17,7 @@ algorithms_names = {'america';'sa4ica';'QICA';'GLICA'}
 
 the_algorithms = 1:length(algorithms_names);
 
-n_trials = 40;
+n_trials = 10;
 
 space = [ length(some_primes), length(n_sources), length(n_samples),...
  length(the_algorithms) ];
@@ -84,8 +84,8 @@ for p_i = 1:length(some_primes)
                 
                 
                 Y = mapeiapermutacao([],X,1:PK,P,K);
-                % A permutacao trivial em X deve dar o próprio X
-                % Comentar este código quando seguro de consistência
+                % A permutacao trivial em X deve dar o prï¿½prio X
+                % Comentar este cï¿½digo quando seguro de consistï¿½ncia
                 assert( all( all( X==Y ) ) );
                 
                 % THe -1 is necessary,since the first element is always zero.
@@ -114,7 +114,7 @@ for p_i = 1:length(some_primes)
 		        
 		        h_joint=-sum(Px(Px>0).*log2(Px(Px>0)));
                 
-                % a tolerância aqui é de 0.2
+                % a tolerï¿½ncia aqui ï¿½ de 0.2
                 assert( h_joint <= h_joint_from_samples + 0.2);
                 assert( h_joint >= h_joint_from_samples - 0.2);
 %                disp('h_joint - h_joint_from_samples');

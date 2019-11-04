@@ -43,8 +43,8 @@ def pure_zipf_plot(s,alphabet_size):
     
     s = str(s)
     s = s.replace('.','_')
-    plt.savefig('distribuicoes\\zipf_s{}_{}.eps'.format(s,alphabet_size))
-    plt.savefig('distribuicoes\\zipf_s{}_{}.png'.format(s,alphabet_size))
+    plt.savefig('distribuicoes\\zipf_s{}_{}.pdf'.format(s,alphabet_size))
+    
     plt.show()
     
 pure_zipf_plot(1.05,27)
@@ -64,13 +64,13 @@ def shuffled_zipf_plot(s,alphabet_size):
     plt.plot(x_range,y_range,'o')
     plt.vlines(x_range,0,y_range)
     
-    plt.title('PMF de uma Zipf misturada\n Alfabeto de tamanho {}, s={}'.format(alphabet_size,s))
+    plt.title('PMF de uma Zipf embaralhada\n Alfabeto de tamanho {}, s={}'.format(alphabet_size,s))
     plt.xlabel('Símbolo')
     
     s = str(s)
     s = s.replace('.','_')
-    plt.savefig('distribuicoes\\shuffledzipf_s{}_{}.eps'.format(s,alphabet_size))
-    plt.savefig('distribuicoes\\shuffledzipf_s{}_{}.png'.format(s,alphabet_size))
+    plt.savefig('distribuicoes\\shuffledzipf_s{}_{}.pdf'.format(s,alphabet_size))
+    
     
     
     plt.show()
@@ -101,16 +101,17 @@ def binomial_pmf_plot(alphabet_size,psucc):
     plt.plot(x_range,y_range,'o')
     plt.vlines(x_range,0,y_range)
     
-    plt.title('PMF de uma binomial \n Alfabeto de tamanho {}, psucc={}'.format(alphabet_size,psucc))
+    plt.title('PMF de uma binomial \n Alfabeto de tamanho {}, p={}'.format(alphabet_size,psucc))
     plt.xlabel('Símbolo')
     
     psucc = str(psucc)
     psucc = psucc.replace('.','')
-    plt.savefig('distribuicoes\\binomial_psucc{}_{}.eps'.format(psucc,alphabet_size))
-    plt.savefig('distribuicoes\\binomial_psucc{}_{}.png'.format(psucc,alphabet_size))
+    plt.savefig('distribuicoes\\binomial_psucc{}_{}.pdf'.format(psucc,alphabet_size))
+    
     
     
     plt.show()
     
-    
+binomial_pmf_plot(2**4,0.2)  
 binomial_pmf_plot(2**4,0.5)
+binomial_pmf_plot(2**4,0.8)

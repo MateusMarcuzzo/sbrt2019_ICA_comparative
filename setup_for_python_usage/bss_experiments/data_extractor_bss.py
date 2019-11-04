@@ -11,14 +11,14 @@ from itertools import product
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import wilcoxon
+from scipy.stats import t
 
 # The colors were too close
 #plt.style.use('ggplot')
 
 plt.style.use('seaborn-bright')
 # If True, generates many plots
-do_plot = True
-
+do_plot = False
 # It's really useful for getting the right indices on .loc usage
 idx = pd.IndexSlice 
 
@@ -37,6 +37,7 @@ rows_list = []
 # diff_setup1_part2.mat
 # diff_setup1_part3.mat
 # diff_setup1_part4.mat << Daniel. Needs a different treatment
+# diff_setup1_part5.mat << also Daniel, more 10 trials, 
 # diff2_setup1.mat
 # setup1.mat
       
@@ -44,6 +45,7 @@ setups_names = ['diff_setup1_part1.mat',
                 'diff_setup1_part2.mat',
                 'diff_setup1_part3.mat',
                 'diff_setup1_part4.mat',
+                'diff_setup1_part5.mat',
                 'diff2_setup1.mat',
                 'setup1.mat']
 
@@ -100,7 +102,7 @@ for some_setup in setups_names:
         talgi = the_algorithm_index = np.min(a_setup['algorithms_names'].index(row[3]))
         temp_dict.update({'algorithm_name': row[3]})
     
-        if some_setup != 'diff_setup1_part4.mat':
+        if some_setup != 'diff_setup1_part4.mat' and some_setup !='diff_setup1_part5.mat':
             # I've put some .copy() at the end, and It seems that it worked
             # It was giving some problems without it
             for trial in range(n_trials):
@@ -277,148 +279,412 @@ T_var_dir = 'T_var'
 K_var_dir = 'K_var'
 P_var_dir = 'P_var'
 
-if do_plot == True:
-    # K variando P e T fixos!
-    # plots for total corr
+marker = {'america':'x','GLICA':'o','sa4ica':'*'}
+
+from time import sleep
+
+confidence = 0.95
+p = 1-confidence
+def plot_K_var_total_corr(slack_time=0):
     
     for prime in df.prime.unique():
         for sample in df.n_samples.unique():
            fig = plt.figure()
-           # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name). Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
-           ax = dfgroupby.mean().loc[idx[prime,:,sample,:],'total_corr'].unstack(level=['prime','n_samples','algorithm_name']).plot(title='Correlação Total com K variando \n P = {}, T = {} fixos'.format(prime,sample),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,:,sample,:],'total_corr'].unstack(level=['prime','n_samples','algorithm_name']))
-           ax.set(ylabel = 'Correlação Total [bits]')
            
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\P{}T{}'.format(total_corr_dir,K_var_dir,prime,sample))
-           fig.savefig('{}\{}\P{}T{}.eps'.format(total_corr_dir,K_var_dir,prime,sample))
-           plt.show()
+           for algorithm in df.algorithm_name.unique():
            
-    # bss_succ  rate
-    for prime in df.prime.unique():
-        for sample in df.n_samples.unique():
-           plt.figure()
-           # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name). Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
-           ax = dfgroupby.mean().loc[idx[prime,:,sample,:],'bss_succ'].unstack(level=['prime','n_samples','algorithm_name']).plot(title='Taxa de Sucesso Separação Total com K variando \n P = {}, T = {} fixos'.format(prime,sample),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,:,sample,:],'bss_succ'].unstack(level=['prime','n_samples','algorithm_name']))
-           ax.set(ylabel = 'Taxa de Sucesso de Separação [0 - 1]')
-           
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\P{}T{}'.format(bss_dir,K_var_dir,prime,sample))
-           fig.savefig('{}\{}\P{}T{}.eps'.format(bss_dir,K_var_dir,prime,sample))
-           
-           plt.show()
-        
-    #plots for trial time
-    
-    for prime in df.prime.unique():
-        for sample in df.n_samples.unique():
-           plt.figure()
-           ax = dfgroupby.mean().loc[idx[prime,:,sample,:],'trial_time'].unstack(level=['prime','n_samples','algorithm_name']).plot(title='Tempo da trial com K variando \n P = {}, T = {} fixos'.format(prime,sample),linewidth=3, marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,:,sample,:],'trial_time'].unstack(level=['prime','n_samples','algorithm_name']))
-           ax.set(ylabel = 'Tempo da trial [s]')
-           ax.set(yscale='log')
-           
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\P{}T{}'.format(trial_dir,K_var_dir,prime,sample))
-           fig.savefig('{}\{}\P{}T{}.eps'.format(trial_dir,K_var_dir,prime,sample))
-           
-           plt.show()
-           
-    # P variando K e T fixos!
-    # plots for total corr
-    
-    for dim in df.n_sources.unique():
-        for sample in df.n_samples.unique():
-           plt.figure()
-           # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico, portanto os níveis 1 (n_sources),2(n_samples) e 3(algorithm_name). Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
-           ax = dfgroupby.mean().loc[idx[:,dim,sample,:],'total_corr'].unstack(level=['n_sources','n_samples','algorithm_name']).plot(title='Correlação Total com P variando \n K = {}, T = {} fixos'.format(dim,sample),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[:,dim,sample,:],'total_corr'].unstack(level=['n_sources','n_samples','algorithm_name']))
-           ax.set(ylabel = 'Correlação Total [bits]')
-           ax.set_xticks(df.prime.unique())
-           
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\K{}T{}'.format(total_corr_dir,P_var_dir,dim,sample))
-           fig.savefig('{}\{}\K{}T{}.eps'.format(total_corr_dir,P_var_dir,dim,sample))
-           
-           plt.show()
+               title= 'Correlação Total com K variando \n P = {}, T = {} fixos, Confiança {}%'.format(prime,sample,confidence*100)
+               # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+               x = np.sort(df.n_sources.unique())
+               
+               # well, and ad hoc exception...because they have less n_sources.
+               if(prime == 7):
+                   my_df = dfgroupby.mean().dropna().copy()
+                   my_df = my_df.reset_index()
+                   my_df = my_df[my_df.prime == 7].n_sources.unique()
+                   x = np.sort(np.array(my_df))
+               
+               y = np.array(dfgroupby.mean().dropna().loc[idx[prime,:,sample,algorithm],'total_corr'].unstack(level=['prime','n_samples','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.dropna().loc[idx[prime,:,sample,algorithm],'total_corr'].unstack(level=['prime','n_samples','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Correlação Total [bits]')
+               plt.xlabel('K')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\P{}T{}.pdf'.format(total_corr_dir,K_var_dir,prime,sample))
           
-    # bss succ rate
-    for dim in df.n_sources.unique():
-        for sample in df.n_samples.unique():
-           plt.figure()
-           # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico, portanto os níveis 1 (n_sources),2(n_samples) e 3(algorithm_name). Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
-           ax = dfgroupby.mean().loc[idx[:,dim,sample,:],'bss_succ'].unstack(level=['n_sources','n_samples','algorithm_name']).plot(title='Taxa de Sucesso de Separação Total com P variando \n K = {}, T = {} fixos'.format(dim,sample),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[:,dim,sample,:],'bss_succ'].unstack(level=['n_sources','n_samples','algorithm_name']))
-           ax.set(ylabel = 'Taxa de Sucesso de Separação [0 - 1]')
-           ax.set_xticks(df.prime.unique())
-           
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\K{}T{}'.format(bss_dir,P_var_dir,dim,sample))
-           fig.savefig('{}\{}\K{}T{}.eps'.format(bss_dir,P_var_dir,dim,sample))
            
            plt.show()
-        
-    #plots for trial time
+           sleep(slack_time)
+
+def plot_K_var_bss_succ(slack_time=0):
     
-    for dim in df.n_sources.unique():
+    for prime in df.prime.unique():
         for sample in df.n_samples.unique():
-           plt.figure()
-           ax = dfgroupby.mean().loc[idx[:,dim,sample,:],'trial_time'].unstack(level=['n_sources','n_samples','algorithm_name']).plot(title='Tempo da trial com P variando \n K = {}, T = {} fixos'.format(dim,sample),linewidth=3, marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[:,dim,sample,:],'trial_time'].unstack(level=['n_sources','n_samples','algorithm_name']))
-           ax.set(ylabel = 'Tempo da trial [s]')
-           ax.set(yscale='log')
-           ax.set_xticks(df.prime.unique())
+           fig = plt.figure()
            
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\K{}T{}'.format(trial_dir,P_var_dir,dim,sample))
-           fig.savefig('{}\{}\K{}T{}.eps'.format(trial_dir,P_var_dir,dim,sample))
+           for algorithm in df.algorithm_name.unique():
+           
+               title= 'Taxa de Separação Total com K variando \n P = {}, T = {} fixos, Confiança {}%'.format(prime,sample,confidence*100)
+               # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+               x = np.sort(df.n_sources.unique())
+               
+                             # well, and ad hoc exception...because they have less n_sources.
+               if(prime == 7):
+                   my_df = dfgroupby.mean().dropna().copy()
+                   my_df = my_df.reset_index()
+                   my_df = my_df[my_df.prime == 7].n_sources.unique()
+                   x = np.sort(np.array(my_df))
+               
+               y = np.array(dfgroupby.mean().dropna().loc[idx[prime,:,sample,algorithm],'bss_succ'].unstack(level=['prime','n_samples','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.dropna().loc[idx[prime,:,sample,algorithm],'bss_succ'].unstack(level=['prime','n_samples','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Taxa de Separação Total [0,1]')
+               plt.xlabel('K')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\P{}T{}.pdf'.format(bss_dir,K_var_dir,prime,sample))
+          
            
            plt.show()
+           sleep(slack_time)
+
+def plot_K_var_trial_time(slack_time=0):
+
+    for prime in df.prime.unique():
+        for sample in df.n_samples.unique():
+           fig = plt.figure()
            
-    # T variando P e T fixos!
+           for algorithm in df.algorithm_name.unique():
+           
+               title= 'Tempo da trial com K variando \n P = {}, T = {} fixos, Confiança {}%'.format(prime,sample, confidence*100)
+               # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+               x = np.sort(df.n_sources.unique())
+               
+               
+                             # well, and ad hoc exception...because they have less n_sources.
+               if(prime == 7):
+                   my_df = dfgroupby.mean().dropna().copy()
+                   my_df = my_df.reset_index()
+                   my_df = my_df[my_df.prime == 7].n_sources.unique()
+                   x = np.sort(np.array(my_df))
+               
+               y = np.array(dfgroupby.mean().dropna().loc[idx[prime,:,sample,algorithm],'trial_time'].unstack(level=['prime','n_samples','algorithm_name']))
+               y = y.flatten()
+               
+               yerr = np.array(dfgroupby_errors.dropna().loc[idx[prime,:,sample,algorithm],'trial_time'].unstack(level=['prime','n_samples','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Tempo da trial [s]')
+               plt.yscale('log')
+               plt.xlabel('K')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\P{}T{}.pdf'.format(trial_dir,K_var_dir,prime,sample))
+          
+           
+           plt.show()
+           sleep(slack_time)
+           
+def plot_P_var_total_corr(slack_time=0):
+
+
+    for dim in df.n_sources.unique():
+        for sample in df.n_samples.unique():
+           fig = plt.figure()
+           
+           for algorithm in df.algorithm_name.unique():
+           
+               title= 'Correlação Total com P variando \n K = {}, T = {} fixos, Confiança {}%'.format(dim,sample,confidence*100)
+               # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+               x = df.prime.unique()
+               
+               
+               # Some strange behaviour here.
+               #It was saying the y and yerr did not have same len. 
+               #So...we did flatten, Also for all other function
+               y = np.array(dfgroupby.mean().loc[idx[:,dim,sample,algorithm],'total_corr'].unstack(level=['n_sources','n_samples','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.loc[idx[:,dim,sample,algorithm],'total_corr'].unstack(level=['n_sources','n_samples','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Correlação Total [bits]')
+               
+               plt.xlabel('P')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\K{}T{}.pdf'.format(total_corr_dir,P_var_dir,dim,sample))
+          
+       
+           plt.show()
+           sleep(slack_time)
+   
+def plot_P_var_bss_succ(slack_time=0):
+    for dim in df.n_sources.unique():
+        for sample in df.n_samples.unique():
+           fig = plt.figure()
+           for algorithm in df.algorithm_name.unique():
+           
+               title= 'Taxa de Separação Total com P variando \n K = {}, T = {} fixos, Confiança {}%'.format(dim,sample,confidence*100)
+               # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+               x = df.prime.unique()
+               
+               y = np.array(dfgroupby.mean().loc[idx[:,dim,sample,algorithm],'bss_succ'].unstack(level=['n_sources','n_samples','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.loc[idx[:,dim,sample,algorithm],'bss_succ'].unstack(level=['n_sources','n_samples','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Taxa de Separação Total [0,1]')
+               plt.xlabel('P')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\K{}T{}.pdf'.format(bss_dir,P_var_dir,dim,sample))
+          
+           
+           plt.show()
+           sleep(slack_time)
+        
+def plot_P_var_trial_time(slack_time=0):
+    
+
+    for dim in df.n_sources.unique():
+        for sample in df.n_samples.unique():
+           fig = plt.figure()
+           for algorithm in df.algorithm_name.unique():
+           
+               title= 'Tempo da trial com P variando \n K = {}, T = {} fixos, Confiança {}%'.format(dim,sample,confidence*100)
+               # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico ou desaparecer do eixo X, portanto os níveis 0 (prime),2(n_samples) e 3(algorithm_name) e 'distribution'. Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
+               x = df.prime.unique()
+               
+               
+               # Some strange behaviour here.
+               #It was saying the y and yerr did not have same len. 
+               #So...we did flatten, Also for all other function
+               y = np.array(dfgroupby.mean().loc[idx[:,dim,sample,algorithm],'trial_time'].unstack(level=['n_sources','n_samples','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.loc[idx[:,dim,sample,algorithm],'trial_time'].unstack(level=['n_sources','n_samples','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Tempo da trial [s]')
+               plt.yscale('log')
+               plt.xlabel('P')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\K{}T{}.pdf'.format(trial_dir,P_var_dir,dim,sample))
+          
+       
+           plt.show()
+           sleep(slack_time)
+
+
+def plot_T_var_total_corr(slack_time=0):
+    for dim in df.n_sources.unique():
+        for prime in df.prime.unique():
+           fig = plt.figure()
+           
+           for algorithm in df.algorithm_name.unique():
+               title= 'Correlação Total com T variando \n P = {}, K = {} fixos, Confiança {}%'.format(prime,dim,confidence*100)
+               x = df.n_samples.unique()
+               
+               # Some strange behaviour here.
+               #It was saying the y and yerr did not have same len. 
+               #So...we did flatten, Also for all other function
+               y = np.array(dfgroupby.mean().loc[idx[prime,dim,:,algorithm],'total_corr'].unstack(level=['prime','n_sources','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.loc[idx[prime,dim,:,algorithm],'total_corr'].unstack(level=['prime','n_sources','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Correlação Total [bits]')
+               
+               plt.xlabel('T')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\P{}K{}.pdf'.format(total_corr_dir,T_var_dir,prime,dim))
+          
+       
+           plt.show()
+           sleep(slack_time)
+           
+def plot_T_var_bss_succ(slack_time=0):
+    for dim in df.n_sources.unique():
+        for prime in df.prime.unique():
+           fig = plt.figure()
+           
+           for algorithm in df.algorithm_name.unique():
+               title= 'Taxa de Separação Total com T variando \n P = {}, K = {} fixos, Confiança {}%'.format(prime,dim,confidence*100)
+               x = df.n_samples.unique()
+               
+               # Some strange behaviour here.
+               #It was saying the y and yerr did not have same len. 
+               #So...we did flatten, Also for all other function
+               y = np.array(dfgroupby.mean().loc[idx[prime,dim,:,algorithm],'bss_succ'].unstack(level=['prime','n_sources','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.loc[idx[prime,dim,:,algorithm],'bss_succ'].unstack(level=['prime','n_sources','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Taxa de Separação Total [0,1]')
+               
+               plt.xlabel('T')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\P{}K{}.pdf'.format(bss_dir,T_var_dir,prime,dim))
+          
+       
+           plt.show()
+           sleep(slack_time)
+           
+           
+def plot_T_var_trial_time(slack_time=0):
+
+    for dim in df.n_sources.unique():
+        for prime in df.prime.unique():
+           fig = plt.figure()
+           
+           for algorithm in df.algorithm_name.unique():
+               title= 'Tempo da trial com com T variando \n P = {}, K = {} fixos, Confiança {}%'.format(prime,dim,confidence*100)
+               x = df.n_samples.unique()
+               
+               # Some strange behaviour here.
+               #It was saying the y and yerr did not have same len. 
+               #So...we did flatten, Also for all other function
+               y = np.array(dfgroupby.mean().loc[idx[prime,dim,:,algorithm],'trial_time'].unstack(level=['prime','n_sources','algorithm_name']))
+               y = y.flatten()
+               yerr = np.array(dfgroupby_errors.loc[idx[prime,dim,:,algorithm],'trial_time'].unstack(level=['prime','n_sources','algorithm_name']))
+               
+               c_interval = t_inv_2tail(p,len(y))
+               yerr = c_interval*yerr.flatten()
+               
+               
+               plt.errorbar(x,y,label = algorithm,linewidth=3,marker=marker[algorithm],markersize=15,linestyle='--',yerr=yerr,markerfacecolor='none')
+               plt.title(title)
+               plt.ylabel('Tempo da trial [s]')
+               plt.yscale('log')
+               plt.xlabel('T')
+               plt.xticks(x)
+               # https://stackoverflow.com/a/36646298/1644727, this may be useful
+               plt.legend()
+
+               
+           fig = plt.gcf()
+           fig.savefig('{}\{}\P{}K{}.pdf'.format(trial_dir,T_var_dir,prime,dim))
+          
+       
+           plt.show()
+           sleep(slack_time)
+
+
+def t_inv_2tail(p,n):
+    # p is live: p<0,05, so you would put if you want confidence of 
+    # 0.95 = 95%
+    # confidence = 1 - p
+    return(t.ppf(1-p/2,n-1))
+    
+def t_inv_singletail(p,n):
+    # p is live: p<0,05, so you would put if you want confidence of 
+    # 0.95 = 95%
+    # confidence = 1 - p
+    return(t.ppf(1-p,n-1))
+
+
+
+slack_time = 0
+if do_plot == True:
+    # K variando P e T fixos!
     # plots for total corr
     
-    for dim in df.n_sources.unique():
-        for prime in df.prime.unique():
-           plt.figure()
-           # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico, portanto os níveis 1 (n_sources),0(prime) e 3(algorithm_name). Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
-           ax = dfgroupby.mean().loc[idx[prime,dim,:,:],'total_corr'].unstack(level=['prime','n_sources','algorithm_name']).plot(title='Correlação Total com T variando \n P = {}, K = {} fixos'.format(prime,dim),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,dim,:,:],'total_corr'].unstack(level=['prime','n_sources','algorithm_name']))
-           ax.set(ylabel = 'Correlação Total [bits]')
-           ax.set_xticks(df.n_samples.unique())
-           
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\K{}P{}'.format(total_corr_dir,T_var_dir,dim,prime))
-           fig.savefig('{}\{}\K{}P{}.eps'.format(total_corr_dir,T_var_dir,dim,prime))
-           
-           plt.show()
-           
-    # bss succ rate       
-    for dim in df.n_sources.unique():
-        for prime in df.prime.unique():
-           plt.figure()
-           # A gente só dá unstack no que é fixo ou deve aparecer na legenda do gráfico, portanto os níveis 1 (n_sources),0(prime) e 3(algorithm_name). Deixei na forma de string para claridade. Desculpa por ter uma linha tão grande, mas é a vida
-           ax = dfgroupby.mean().loc[idx[prime,dim,:,:],'bss_succ'].unstack(level=['prime','n_sources','algorithm_name']).plot(title='Taxa de Sucesso de Separação Total com T variando \n P = {}, K = {} fixos'.format(prime,dim),linewidth=3,marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,dim,:,:],'bss_succ'].unstack(level=['prime','n_sources','algorithm_name']))
-           ax.set(ylabel = 'Taxa de Sucesso de Separação [0 - 1]')
-           ax.set_xticks(df.n_samples.unique())
-           
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\K{}P{}'.format(bss_dir,T_var_dir,dim,prime))
-           fig.savefig('{}\{}\K{}P{}.eps'.format(bss_dir,T_var_dir,dim,prime))
-           plt.show()
-        
-    #plots for trial time
+    plot_K_var_total_corr(slack_time)
+    plot_K_var_trial_time(slack_time)
+    plot_K_var_bss_succ(slack_time)
     
-    for dim in df.n_sources.unique():
-        for prime in df.prime.unique():
-           plt.figure()
-           ax = dfgroupby.mean().loc[idx[prime,dim,:,:],'trial_time'].unstack(level=['prime','n_sources','algorithm_name']).plot(title='Tempo da trial com T variando \n P = {}, K = {} fixos'.format(prime,dim),linewidth=3, marker='o',markersize=10,linestyle='--',yerr=dfgroupby_errors.loc[idx[prime,dim,:,:],'trial_time'].unstack(level=['prime','n_sources','algorithm_name']))
-           ax.set(ylabel = 'Tempo da trial [s]')
-           ax.set(yscale='log')
-           ax.set_xticks(df.n_samples.unique())
-           
-           
-           fig = ax.get_figure()
-           fig.savefig('{}\{}\K{}P{}'.format(trial_dir,T_var_dir,dim,prime))
-           fig.savefig('{}\{}\K{}P{}.eps'.format(trial_dir,T_var_dir,dim,prime))
-           
-           plt.show()
-           
-           
+    plot_P_var_total_corr(slack_time)
+    plot_P_var_trial_time(slack_time)
+    plot_P_var_bss_succ(slack_time)
+    
+    plot_T_var_total_corr(slack_time)
+    plot_T_var_trial_time(slack_time)
+    plot_T_var_bss_succ(slack_time)
+    
+
            
 def select_trials_from(df,prime,n_sources,n_samples,algorithm,the_col):
     return df[(df.prime==prime)&\
@@ -438,42 +704,48 @@ def get_perfect_bss():
 def get_0_bss():
     return dfgroupby.mean().loc[(dfgroupby.mean()['bss_succ'] == 0)]
 
+# https://medium.com/@SciencelyYours/errors-bars-standard-errors-and-confidence-intervals-on-line-and-bar-graphics-matlab-254d6aa32b76
+# https://stackoverflow.com/questions/19339305/python-function-to-get-the-t-statistic
+    
+
 
 ### 15/10/2019
-#  trying wilcoxon test part for bss
-
-zero_method = 'wilcox'
-alternative = 'greater'
-algo1 = 'america'
-algo2 = 'GLICA'
-print('wilcoxon for {} vs {} on bss_succ, test {}'.format(algo1,algo2,alternative))    
-for prime in df.prime.unique():
-    for source in df.n_sources.unique():
-        for sample in df.n_samples.unique():
-            x = select_trials_from(df,prime,source,sample,algo1,'bss_succ')
-            y = select_trials_from(df,prime,source,sample,algo2,'bss_succ')
-            try:
-                result = wilcoxon(x,y,zero_method=zero_method,alternative=alternative)
-                
-                if(result[1] < 0.05):
-                    print('wilcoxon test on P={},K={},T={}'.format(prime,source,sample))
-                    print(result)
-                
-            except:
-                pass
-            
-#  trying wilcoxon test part for total_corr
-    
+##  trying wilcoxon test part for bss
+# 27/10/2019
+    ## COmentado por enquanto
+#zero_method = 'wilcox'
+#alternative = 'greater'
+#algo1 = 'america'
+#algo2 = 'GLICA'
+#print('wilcoxon for {} vs {} on bss_succ, test {}'.format(algo1,algo2,alternative))    
+#for prime in df.prime.unique():
+#    for source in df.n_sources.unique():
+#        for sample in df.n_samples.unique():
+#            x = select_trials_from(df,prime,source,sample,algo1,'bss_succ')
+#            y = select_trials_from(df,prime,source,sample,algo2,'bss_succ')
+#            try:
+#                result = wilcoxon(x,y,zero_method=zero_method,alternative=alternative)
+#                
+#                if(result[1] < 0.05):
+#                    print('wilcoxon test on P={},K={},T={}'.format(prime,source,sample))
+#                    print(result)
+#                
+#            except:
+#                pass
+#            
+##  trying wilcoxon test part for total_corr
+#    
 zero_method = 'wilcox'
 alternative = 'less'
 algo1 = 'america'
-algo2 = 'GLICA'
-print('\n wilcoxon for {} vs {} on total_corr, test {}'.format(algo1,algo2,alternative))  
+algo2 = 'sa4ica'
+target_value = 'trial_time'
+print('\n wilcoxon for {} vs {} on {}, test {}'.format(algo1,algo2,target_value,alternative))  
 for prime in df.prime.unique():
     for source in df.n_sources.unique():
         for sample in df.n_samples.unique():
-            x = select_trials_from(df,prime,source,sample,algo1,'total_corr')
-            y = select_trials_from(df,prime,source,sample,algo2,'total_corr')
+            x = select_trials_from(df,prime,source,sample,algo1,target_value)
+            y = select_trials_from(df,prime,source,sample,algo2,target_value)
             try:
                 result = wilcoxon(x,y,zero_method=zero_method,alternative=alternative)
                 
@@ -484,58 +756,24 @@ for prime in df.prime.unique():
             except:
                 pass
    
-# 16/10/2019
-# trying wilcoxon test regarding the means 
-                
+## 16/10/2019
+## trying wilcoxon test regarding the means, something like Daniel did
+#                
 def select_all_P_mean_cases_from(dfgroupbymean,prime,algorithm,column):
     return dfgroupbymean.loc[idx[prime,:,:,algorithm],column]
 
 
-## Test for bss_succ, america vs GLICA,
-zero_method = 'wilcox'
-alternative = 'greater'      
 
-algo1 = 'america'
-algo2 = 'GLICA' 
-print('wilcoxon on GF(P) means for {} vs {} on bss_succ, test {}'.format(algo1,algo2,alternative))  
-
+print('\n wilcoxon for P_mean {} vs {} on {}, test {}'.format(algo1,algo2,target_value,alternative))  
 for prime in df.prime.unique():
-
-    x = np.array(select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo1,'bss_succ'))
-    y = np.array(select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo2,'bss_succ'))
+    x = select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo1,target_value)
+    y = select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo2,target_value)
     try:
-        
-        print('wilcoxon test on P={} means'.format(prime))
         result = wilcoxon(x,y,zero_method=zero_method,alternative=alternative)
         
-        
-        print(result)
-        
-    except:
-        pass 
-
-
-## test for total_corr america vs GLICA, less
-zero_method = 'wilcox'
-alternative = 'less'       
-
-algo1 = 'america'
-algo2 = 'GLICA' 
-print('wilcoxon on GF(P) means for {} vs {} on total_corr, test {}'.format(algo1,algo2,alternative))  
-
-for prime in df.prime.unique():
-
-    x = np.array(select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo1,'total_corr'))
-    y = np.array(select_all_P_mean_cases_from(dfgroupby.mean().dropna(),prime,algo2,'total_corr'))
-    try:
-        
-        print('wilcoxon test on P={} means'.format(prime))
-        result = wilcoxon(x,y,zero_method=zero_method,alternative=alternative)
-        
-        
-        print(result)
+        if(result[1] < 0.05):
+            print('wilcoxon test on P={}'.format(prime))
+            print(result)
         
     except:
-        pass 
-  
-    
+        pass

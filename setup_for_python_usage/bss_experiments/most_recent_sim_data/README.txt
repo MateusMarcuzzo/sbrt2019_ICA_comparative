@@ -50,7 +50,10 @@ n_sources evaluated
 ---
 
 diff_setup1_part4.mat
-will handle later (TODO), but we did handle the P5K8 problem here. It's Daniel's file.
+we handled in the script
+40 trials
+P5
+K8
 
 ---
 
@@ -68,3 +71,14 @@ If we could compile everyone, with the singular exception of n_trials = 40 on p5
 some_primes = [ 2 3 5 7]
 n_sources = [2 3 4 5 6 7 8]
 # p7 and k = 6,7,8, not evaluated. Too long to run
+
+----------
+
+diff_setup1_part5.mat 
+b_trials = 10
+primes evaluated
+[5]
+n_sources evaluated
+[8]
+
+so, now we have 50 trials for every scenario.
